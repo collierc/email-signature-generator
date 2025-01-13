@@ -107,7 +107,6 @@
                         let width = img.width;
                         let height = img.height;
 
-                        // Calculate new dimensions maintaining aspect ratio
                         if (width > maxWidth) {
                             height = (height * maxWidth) / width;
                             width = maxWidth;
@@ -122,7 +121,6 @@
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, width, height);
                         
-                        // Compress as JPEG with 0.7 quality
                         resolve(canvas.toDataURL('image/jpeg', 0.7));
                     };
                 });
@@ -197,21 +195,21 @@
                                         <td style="padding-bottom: 5px; background-color: transparent;">
                                             ${formData.companyLogoUrl ? 
                                                 `<div style="margin-bottom: 2px; background-color: transparent;"><img src="${formData.companyLogoUrl}" alt="Company Logo" style="height: 25px;"/></div>` : ''}
-                                            <span style="color: #000000; font-weight: bold;">${formData.name}</span>
-                                            ${formData.title ? ` | <span style="font-weight: bold;">${formData.title.toUpperCase()}</span>` : ''}
+                                            <span style="color: #000000; font-weight: bold;">${safeFormData.name}</span>
+                                            ${safeFormData.title ? ` | <span style="font-weight: bold;">${safeFormData.title.toUpperCase()}</span>` : ''}
                                         </td>
                                     </tr>
-                                    <tr>
-                                        <td style="color: #000000;">
-                                            ${formData.directPhone ? `D: ${formData.directPhone}` : ''}
-                                            ${formData.cellPhone ? ` | C: ${formData.cellPhone}` : ''}
+                                    <tr style="background-color: transparent;">
+                                        <td style="color: #000000; background-color: transparent;">
+                                            ${safeFormData.directPhone ? `D: ${safeFormData.directPhone}` : ''}
+                                            ${safeFormData.cellPhone ? ` | C: ${safeFormData.cellPhone}` : ''}
                                         </td>
                                     </tr>
-                                    <tr>
-                                        <td>
-                                            <a href="mailto:${formData.email}" style="color: #4A90E2; text-decoration: none;">${formData.email}</a>
-                                            ${formData.companyWebsite ? ` | <a href="https://${formData.companyWebsite}" style="color: #4A90E2; text-decoration: none;">${formData.companyWebsite}</a>` : ''}
-                                            ${formData.meetingLink ? ` | <a href="${formData.meetingLink}" style="color: #4A90E2; text-decoration: none;">Schedule a meeting</a>` : ''}
+                                    <tr style="background-color: transparent;">
+                                        <td style="background-color: transparent;">
+                                            <a href="mailto:${safeFormData.email}" style="color: #4A90E2; text-decoration: none;">${safeFormData.email}</a>
+                                            ${safeFormData.companyWebsite ? ` | <a href="https://${safeFormData.companyWebsite}" style="color: #4A90E2; text-decoration: none;">${safeFormData.companyWebsite}</a>` : ''}
+                                            ${safeFormData.meetingLink ? ` | <a href="${safeFormData.meetingLink}" style="color: #4A90E2; text-decoration: none;">Schedule a meeting</a>` : ''}
                                         </td>
                                     </tr>
                                 </table>
@@ -373,18 +371,3 @@
                                 Copy Signature
                             </button>
                         </div>
-
-                        {showPreview && (
-                            <div className="mt-4 border p-4 rounded">
-                                <div dangerouslySetInnerHTML={{ __html: generateSignature() }} />
-                            </div>
-                        )}
-                    </div>
-                </div>
-            );
-        };
-
-        ReactDOM.render(<EmailSignatureGenerator />, document.getElementById('root'));
-    </script>
-</body>
-</html>
