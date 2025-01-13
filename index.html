@@ -168,7 +168,7 @@
             const generateSignature = () => {
                 // Strip any potential HTML tags from input values
                 const sanitizeInput = (str) => {
-                    return str.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                    return str ? str.replace(/</g, '&lt;').replace(/>/g, '&gt;') : '';
                 };
 
                 const safeFormData = {
@@ -366,8 +366,24 @@
                             </button>
                             <button
                                 onClick={copyToClipboard}
-                                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-
+                            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
                             >
                                 Copy Signature
                             </button>
                         </div>
+
+                        {showPreview && (
+                            <div className="mt-4 border p-4 rounded">
+                                <div dangerouslySetInnerHTML={{ __html: generateSignature() }} />
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        ReactDOM.render(<EmailSignatureGenerator />, document.getElementById('root'));
+    </script>
+</body>
+</html>
