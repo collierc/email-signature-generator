@@ -32,8 +32,8 @@
         }
 
         .image-preview {
-            width: 90px;
-            height: 110px;
+            width: 85px;
+            height: 100px;
             object-fit: cover;
             border-radius: 4px;
         }
@@ -98,6 +98,52 @@
                 meetingLink: ''
             });
 
+            const compressImage = (base64String, maxWidth, maxHeight) => {
+                return new Promise((resolve) => {
+                    const img = new Image();
+                    img.src = base64String;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+
+                        // Calculate new dimensions maintaining aspect ratio
+                        if (width > maxWidth) {
+                            height = (height * maxWidth) / width;
+                            width = maxWidth;
+                        }
+                        if (height > maxHeight) {
+                            width = (width * maxHeight) / height;
+                            height = maxHeight;
+                        }
+
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        
+                        // Compress as JPEG with 0.7 quality
+                        resolve(canvas.toDataURL('image/jpeg', 0.7));
+                    };
+                });
+            };
+
+            const handlePhotoUpload = async (base64Image) => {
+                const compressed = await compressImage(base64Image, 170, 200);
+                setFormData(prev => ({
+                    ...prev,
+                    photoUrl: compressed
+                }));
+            };
+
+            const handleLogoUpload = async (base64Image) => {
+                const compressed = await compressImage(base64Image, 100, 50);
+                setFormData(prev => ({
+                    ...prev,
+                    companyLogoUrl: compressed
+                }));
+            };
+
             const formatPhoneNumber = (input) => {
                 const numbers = input.replace(/\D/g, '');
                 if (numbers.length === 10) {
@@ -121,28 +167,14 @@
                 }
             };
 
-            const handlePhotoUpload = (base64Image) => {
-                setFormData(prev => ({
-                    ...prev,
-                    photoUrl: base64Image
-                }));
-            };
-
-            const handleLogoUpload = (base64Image) => {
-                setFormData(prev => ({
-                    ...prev,
-                    companyLogoUrl: base64Image
-                }));
-            };
-
             const generateSignature = () => {
                 return `
                     <table style="font-family: Arial, sans-serif; font-size: 12px; line-height: 1.4;">
                         <tr>
                             <td style="vertical-align: top; padding-right: 10px;">
                                 ${formData.photoUrl ? 
-                                    `<img src="${formData.photoUrl}" alt="Profile Photo" style="width: 90px; height: 110px; border-radius: 4px; object-fit: cover;"/>` : 
-                                    '<div style="width: 90px; height: 110px; background-color: #f0f0f0; border-radius: 4px;"></div>'}
+                                    `<img src="${formData.photoUrl}" alt="Profile Photo" style="width: 85px; height: 100px; border-radius: 4px; object-fit: cover;"/>` : 
+                                    '<div style="width: 85px; height: 100px; background-color: #f0f0f0; border-radius: 4px;"></div>'}
                             </td>
                             <td style="vertical-align: top;">
                                 <table style="border-collapse: collapse;">
@@ -155,16 +187,16 @@
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td style="color: #666666;">
+                                        <td style="color: #000000;">
                                             ${formData.directPhone ? `D: ${formData.directPhone}` : ''}
                                             ${formData.cellPhone ? ` | C: ${formData.cellPhone}` : ''}
                                         </td>
                                     </tr>
                                     <tr>
                                         <td>
-                                            <a href="mailto:${formData.email}" style="color: #0066cc; text-decoration: none;">${formData.email}</a>
-                                            ${formData.companyWebsite ? ` | <a href="https://${formData.companyWebsite}" style="color: #0066cc; text-decoration: none;">${formData.companyWebsite}</a>` : ''}
-                                            ${formData.meetingLink ? ` | <a href="${formData.meetingLink}" style="color: #0066cc; text-decoration: none;">Schedule a meeting</a>` : ''}
+                                            <a href="mailto:${formData.email}" style="color: #4A90E2; text-decoration: none;">${formData.email}</a>
+                                            ${formData.companyWebsite ? ` | <a href="https://${formData.companyWebsite}" style="color: #4A90E2; text-decoration: none;">${formData.companyWebsite}</a>` : ''}
+                                            ${formData.meetingLink ? ` | <a href="${formData.meetingLink}" style="color: #4A90E2; text-decoration: none;">Schedule a meeting</a>` : ''}
                                         </td>
                                     </tr>
                                 </table>
