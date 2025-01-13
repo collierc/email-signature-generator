@@ -8,9 +8,33 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.js"></script>
+    <style>
+        .copy-alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem;
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 4px;
+            display: none;
+            animation: fadeIn 0.3s, fadeOut 0.3s 2.7s;
+        }
+
+        @keyframes fadeIn {
+            from {opacity: 0;}
+            to {opacity: 1;}
+        }
+
+        @keyframes fadeOut {
+            from {opacity: 1;}
+            to {opacity: 0;}
+        }
+    </style>
 </head>
 <body class="bg-gray-100 min-h-screen p-4">
     <div id="root"></div>
+    <div id="copyAlert" class="copy-alert">Signature copied! Paste in Gmail using Ctrl+V (or Cmd+V on Mac)</div>
 
     <script type="text/babel">
         const EmailSignatureGenerator = () => {
@@ -36,7 +60,7 @@
             };
 
             const generateSignature = () => {
-                const signature = `
+                return `
                     <table style="font-family: Arial, sans-serif; font-size: 12px; line-height: 1.4;">
                         <tr>
                             <td style="vertical-align: top; padding-right: 10px;">
@@ -72,12 +96,40 @@
                         </tr>
                     </table>
                 `;
-                return signature;
+            };
+
+            const showCopyAlert = () => {
+                const alert = document.getElementById('copyAlert');
+                alert.style.display = 'block';
+                setTimeout(() => {
+                    alert.style.display = 'none';
+                }, 3000);
             };
 
             const copyToClipboard = () => {
-                const signature = generateSignature();
-                navigator.clipboard.writeText(signature);
+                // Create a temporary div with the signature
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = generateSignature();
+                document.body.appendChild(tempDiv);
+                
+                // Select the content
+                const range = document.createRange();
+                range.selectNodeContents(tempDiv);
+                const selection = window.getSelection();
+                selection.removeAllRanges();
+                selection.addRange(range);
+                
+                try {
+                    // Execute copy command
+                    document.execCommand('copy');
+                    showCopyAlert();
+                } catch (err) {
+                    alert('Failed to copy signature. Please try again.');
+                }
+                
+                // Cleanup
+                selection.removeAllRanges();
+                document.body.removeChild(tempDiv);
             };
 
             return (
@@ -207,7 +259,7 @@
                                 onClick={copyToClipboard}
                                 className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
                             >
-                                Copy Signature HTML
+                                Copy Signature
                             </button>
                         </div>
 
