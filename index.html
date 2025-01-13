@@ -30,6 +30,20 @@
             from {opacity: 1;}
             to {opacity: 0;}
         }
+
+        .image-preview {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .logo-preview {
+            height: 40px;
+            width: auto;
+            max-width: 200px;
+            object-fit: contain;
+        }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen p-4">
@@ -37,6 +51,39 @@
     <div id="copyAlert" class="copy-alert">Signature copied! Paste in Gmail using Ctrl+V (or Cmd+V on Mac)</div>
 
     <script type="text/babel">
+        const ImageUpload = ({ id, label, onChange, preview, className }) => {
+            const handleFileChange = (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                        onChange(reader.result);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+
+            return (
+                <div>
+                    <label className="block text-sm font-medium mb-1">{label}</label>
+                    <input
+                        type="file"
+                        id={id}
+                        accept="image/*"
+                        onChange={handleFileChange}
+                        className="w-full p-2 border rounded mb-2"
+                    />
+                    {preview && (
+                        <img
+                            src={preview}
+                            alt={`${label} preview`}
+                            className={className}
+                        />
+                    )}
+                </div>
+            );
+        };
+
         const EmailSignatureGenerator = () => {
             const [showPreview, setShowPreview] = React.useState(false);
             const [formData, setFormData] = React.useState({
@@ -59,13 +106,27 @@
                 }));
             };
 
+            const handlePhotoUpload = (base64Image) => {
+                setFormData(prev => ({
+                    ...prev,
+                    photoUrl: base64Image
+                }));
+            };
+
+            const handleLogoUpload = (base64Image) => {
+                setFormData(prev => ({
+                    ...prev,
+                    companyLogoUrl: base64Image
+                }));
+            };
+
             const generateSignature = () => {
                 return `
                     <table style="font-family: Arial, sans-serif; font-size: 12px; line-height: 1.4;">
                         <tr>
                             <td style="vertical-align: top; padding-right: 10px;">
                                 ${formData.photoUrl ? 
-                                    `<img src="${formData.photoUrl}" alt="Profile Photo" style="width: 80px; height: 80px; border-radius: 4px;"/>` : 
+                                    `<img src="${formData.photoUrl}" alt="Profile Photo" style="width: 80px; height: 80px; border-radius: 4px; object-fit: cover;"/>` : 
                                     '<div style="width: 80px; height: 80px; background-color: #f0f0f0; border-radius: 4px;"></div>'}
                             </td>
                             <td style="vertical-align: top;">
@@ -107,12 +168,10 @@
             };
 
             const copyToClipboard = () => {
-                // Create a temporary div with the signature
                 const tempDiv = document.createElement('div');
                 tempDiv.innerHTML = generateSignature();
                 document.body.appendChild(tempDiv);
                 
-                // Select the content
                 const range = document.createRange();
                 range.selectNodeContents(tempDiv);
                 const selection = window.getSelection();
@@ -120,14 +179,12 @@
                 selection.addRange(range);
                 
                 try {
-                    // Execute copy command
                     document.execCommand('copy');
                     showCopyAlert();
                 } catch (err) {
                     alert('Failed to copy signature. Please try again.');
                 }
                 
-                // Cleanup
                 selection.removeAllRanges();
                 document.body.removeChild(tempDiv);
             };
@@ -156,34 +213,26 @@
                                     value={formData.title}
                                     onChange={handleInputChange}
                                     className="w-full p-2 border rounded"
-                                    placeholder="CHIEF GROWTH OFFICER"
+                                    placeholder="BUSINESS DEVELOPMENT MANAGER"
                                 />
                             </div>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-sm font-medium mb-1">Profile Photo URL</label>
-                                <input
-                                    type="url"
-                                    name="photoUrl"
-                                    value={formData.photoUrl}
-                                    onChange={handleInputChange}
-                                    className="w-full p-2 border rounded"
-                                    placeholder="https://example.com/photo.jpg"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium mb-1">Company Logo URL</label>
-                                <input
-                                    type="url"
-                                    name="companyLogoUrl"
-                                    value={formData.companyLogoUrl}
-                                    onChange={handleInputChange}
-                                    className="w-full p-2 border rounded"
-                                    placeholder="https://example.com/logo.png"
-                                />
-                            </div>
+                            <ImageUpload
+                                id="profilePhoto"
+                                label="Profile Photo"
+                                onChange={handlePhotoUpload}
+                                preview={formData.photoUrl}
+                                className="image-preview"
+                            />
+                            <ImageUpload
+                                id="companyLogo"
+                                label="Company Logo"
+                                onChange={handleLogoUpload}
+                                preview={formData.companyLogoUrl}
+                                className="logo-preview"
+                            />
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -244,7 +293,7 @@
                                 value={formData.meetingLink}
                                 onChange={handleInputChange}
                                 className="w-full p-2 border rounded"
-                                placeholder="https://calendly.com/..."
+                                placeholder="https://meetings.hubspot.com/..."
                             />
                         </div>
 
