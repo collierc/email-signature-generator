@@ -39,7 +39,7 @@
         }
 
         .logo-preview {
-            height: 45px;
+            height: 25px;
             width: auto;
             max-width: 200px;
             object-fit: contain;
@@ -98,12 +98,27 @@
                 meetingLink: ''
             });
 
+            const formatPhoneNumber = (input) => {
+                const numbers = input.replace(/\D/g, '');
+                if (numbers.length === 10) {
+                    return numbers.replace(/(\d{3})(\d{3})(\d{4})/, '$1.$2.$3');
+                }
+                return input;
+            };
+
             const handleInputChange = (e) => {
                 const { name, value } = e.target;
-                setFormData(prev => ({
-                    ...prev,
-                    [name]: value
-                }));
+                if (name === 'directPhone' || name === 'cellPhone') {
+                    setFormData(prev => ({
+                        ...prev,
+                        [name]: formatPhoneNumber(value)
+                    }));
+                } else {
+                    setFormData(prev => ({
+                        ...prev,
+                        [name]: value
+                    }));
+                }
             };
 
             const handlePhotoUpload = (base64Image) => {
@@ -134,9 +149,9 @@
                                     <tr>
                                         <td style="padding-bottom: 5px;">
                                             ${formData.companyLogoUrl ? 
-                                                `<div style="margin-bottom: 2px;"><img src="${formData.companyLogoUrl}" alt="Company Logo" style="height: 45px;"/></div>` : ''}
+                                                `<div style="margin-bottom: 2px;"><img src="${formData.companyLogoUrl}" alt="Company Logo" style="height: 25px;"/></div>` : ''}
                                             <span style="color: #000000; font-weight: bold;">${formData.name}</span>
-                                            ${formData.title ? ` | ${formData.title.toUpperCase()}` : ''}
+                                            ${formData.title ? ` | <span style="font-weight: bold;">${formData.title.toUpperCase()}</span>` : ''}
                                         </td>
                                     </tr>
                                     <tr>
@@ -244,7 +259,7 @@
                                     value={formData.directPhone}
                                     onChange={handleInputChange}
                                     className="w-full p-2 border rounded"
-                                    placeholder="205.838.2834"
+                                    placeholder="205.258.9589"
                                 />
                             </div>
                             <div>
@@ -255,7 +270,7 @@
                                     value={formData.cellPhone}
                                     onChange={handleInputChange}
                                     className="w-full p-2 border rounded"
-                                    placeholder="205.370.0992"
+                                    placeholder="205.258.9589"
                                 />
                             </div>
                         </div>
