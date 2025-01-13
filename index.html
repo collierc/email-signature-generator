@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Signature Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.js"></script>
+</head>
+<body class="bg-gray-100 min-h-screen p-4">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const EmailSignatureGenerator = () => {
+            const [showPreview, setShowPreview] = React.useState(false);
+            const [formData, setFormData] = React.useState({
+                name: '',
+                title: '',
+                photoUrl: '',
+                companyLogoUrl: '',
+                directPhone: '',
+                cellPhone: '',
+                email: '',
+                companyWebsite: '',
+                meetingLink: ''
+            });
+
+            const handleInputChange = (e) => {
+                const { name, value } = e.target;
+                setFormData(prev => ({
+                    ...prev,
+                    [name]: value
+                }));
+            };
+
+            const generateSignature = () => {
+                const signature = `
+                    <table style="font-family: Arial, sans-serif; font-size: 12px; line-height: 1.4;">
+                        <tr>
+                            <td style="vertical-align: top; padding-right: 10px;">
+                                ${formData.photoUrl ? 
+                                    `<img src="${formData.photoUrl}" alt="Profile Photo" style="width: 80px; height: 80px; border-radius: 4px;"/>` : 
+                                    '<div style="width: 80px; height: 80px; background-color: #f0f0f0; border-radius: 4px;"></div>'}
+                            </td>
+                            <td style="vertical-align: top;">
+                                <table style="border-collapse: collapse;">
+                                    <tr>
+                                        <td style="padding-bottom: 5px;">
+                                            ${formData.companyLogoUrl ? 
+                                                `<img src="${formData.companyLogoUrl}" alt="Company Logo" style="height: 20px; margin-right: 5px; vertical-align: middle;"/>` : ''}
+                                            <span style="color: #000000; font-weight: bold;">${formData.name}</span>
+                                            ${formData.title ? ` | ${formData.title.toUpperCase()}` : ''}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="color: #666666;">
+                                            ${formData.directPhone ? `D: ${formData.directPhone}` : ''}
+                                            ${formData.cellPhone ? ` | C: ${formData.cellPhone}` : ''}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <a href="mailto:${formData.email}" style="color: #0066cc; text-decoration: none;">${formData.email}</a>
+                                            ${formData.companyWebsite ? ` | <a href="https://${formData.companyWebsite}" style="color: #0066cc; text-decoration: none;">${formData.companyWebsite}</a>` : ''}
+                                            ${formData.meetingLink ? ` | <a href="${formData.meetingLink}" style="color: #0066cc; text-decoration: none;">Schedule a meeting</a>` : ''}
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                `;
+                return signature;
+            };
+
+            const copyToClipboard = () => {
+                const signature = generateSignature();
+                navigator.clipboard.writeText(signature);
+            };
+
+            return (
+                <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-lg p-6">
+                    <h1 className="text-2xl font-bold mb-6">Email Signature Generator</h1>
+                    <div className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium mb-1">Name</label>
+                                <input
+                                    type="text"
+                                    name="name"
+                                    value={formData.name}
+                                    onChange={handleInputChange}
+                                    className="w-full p-2 border rounded"
+                                    placeholder="Full Name"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium mb-1">Title</label>
+                                <input
+                                    type="text"
+                                    name="title"
+                                    value={formData.title}
+                                    onChange={handleInputChange}
+                                    className="w-full p-2 border rounded"
+                                    placeholder="CHIEF GROWTH OFFICER"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium mb-1">Profile Photo URL</label>
+                                <input
+                                    type="url"
+                                    name="photoUrl"
+                                    value={formData.photoUrl}
+                                    onChange={handleInputChange}
+                                    className="w-full p-2 border rounded"
+                                    placeholder="https://example.com/photo.jpg"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium mb-1">Company Logo URL</label>
+                                <input
+                                    type="url"
+                                    name="companyLogoUrl"
+                                    value={formData.companyLogoUrl}
+                                    onChange={handleInputChange}
+                                    className="w-full p-2 border rounded"
+                                    placeholder="https://example.com/logo.png"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium mb-1">Direct Phone</label>
+                                <input
+                                    type="tel"
+                                    name="directPhone"
+                                    value={formData.directPhone}
+                                    onChange={handleInputChange}
+                                    className="w-full p-2 border rounded"
+                                    placeholder="205.838.2834"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium mb-1">Cell Phone</label>
+                                <input
+                                    type="tel"
+                                    name="cellPhone"
+                                    value={formData.cellPhone}
+                                    onChange={handleInputChange}
+                                    className="w-full p-2 border rounded"
+                                    placeholder="205.370.0992"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium mb-1">Email</label>
+                                <input
+                                    type="email"
+                                    name="email"
+                                    value={formData.email}
+                                    onChange={handleInputChange}
+                                    className="w-full p-2 border rounded"
+                                    placeholder="name@company.com"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium mb-1">Company Website</label>
+                                <input
+                                    type="text"
+                                    name="companyWebsite"
+                                    value={formData.companyWebsite}
+                                    onChange={handleInputChange}
+                                    className="w-full p-2 border rounded"
+                                    placeholder="company.com"
+                                />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium mb-1">Meeting Schedule Link</label>
+                            <input
+                                type="url"
+                                name="meetingLink"
+                                value={formData.meetingLink}
+                                onChange={handleInputChange}
+                                className="w-full p-2 border rounded"
+                                placeholder="https://calendly.com/..."
+                            />
+                        </div>
+
+                        <div className="flex gap-4">
+                            <button
+                                onClick={() => setShowPreview(!showPreview)}
+                                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                            >
+                                {showPreview ? 'Hide Preview' : 'Show Preview'}
+                            </button>
+                            <button
+                                onClick={copyToClipboard}
+                                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                            >
+                                Copy Signature HTML
+                            </button>
+                        </div>
+
+                        {showPreview && (
+                            <div className="mt-4 border p-4 rounded">
+                                <div dangerouslySetInnerHTML={{ __html: generateSignature() }} />
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        ReactDOM.render(<EmailSignatureGenerator />, document.getElementById('root'));
+    </script>
+</body>
+</html>
