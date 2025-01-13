@@ -32,8 +32,8 @@
         }
 
         .image-preview {
-            width: 100px;
-            height: 100px;
+            width: 90px;
+            height: 110px;
             object-fit: cover;
             border-radius: 4px;
         }
@@ -126,15 +126,15 @@
                         <tr>
                             <td style="vertical-align: top; padding-right: 10px;">
                                 ${formData.photoUrl ? 
-                                    `<img src="${formData.photoUrl}" alt="Profile Photo" style="width: 80px; height: 80px; border-radius: 4px; object-fit: cover;"/>` : 
-                                    '<div style="width: 80px; height: 80px; background-color: #f0f0f0; border-radius: 4px;"></div>'}
+                                    `<img src="${formData.photoUrl}" alt="Profile Photo" style="width: 90px; height: 110px; border-radius: 4px; object-fit: cover;"/>` : 
+                                    '<div style="width: 90px; height: 110px; background-color: #f0f0f0; border-radius: 4px;"></div>'}
                             </td>
                             <td style="vertical-align: top;">
                                 <table style="border-collapse: collapse;">
                                     <tr>
                                         <td style="padding-bottom: 5px;">
                                             ${formData.companyLogoUrl ? 
-                                                `<div style="margin-bottom: 5px;"><img src="${formData.companyLogoUrl}" alt="Company Logo" style="height: 45px;"/></div>` : ''}
+                                                `<div style="margin-bottom: 2px;"><img src="${formData.companyLogoUrl}" alt="Company Logo" style="height: 45px;"/></div>` : ''}
                                             <span style="color: #000000; font-weight: bold;">${formData.name}</span>
                                             ${formData.title ? ` | ${formData.title.toUpperCase()}` : ''}
                                         </td>
