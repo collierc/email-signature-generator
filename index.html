@@ -30,19 +30,6 @@
       from {opacity: 1;}
       to {opacity: 0;}
     }
-
-    .image-preview {
-      width: 85px;
-      height: 100px;
-      object-fit: cover;
-      border-radius: 4px;
-    }
-    .logo-preview {
-      height: 25px;
-      width: auto;
-      max-width: 200px;
-      object-fit: contain;
-    }
   </style>
 </head>
 <body class="bg-gray-100 min-h-screen p-4">
@@ -50,9 +37,11 @@
   <div id="copyAlert" class="copy-alert">
     Signature copied! Paste in Gmail using Ctrl+V (or Cmd+V on Mac)
   </div>
+  <div id="copyHtmlAlert" class="copy-alert" style="background-color: #2196F3;">
+    HTML copied! Paste into any HTML editor.
+  </div>
 
   <script type="text/babel">
-
     const EmailSignatureGenerator = () => {
       const [showPreview, setShowPreview] = React.useState(false);
       const [formData, setFormData] = React.useState({
@@ -67,115 +56,28 @@
         meetingLink: ''
       });
 
-      // If you want special formatting for phone numbers:
-      const formatPhoneNumber = (input) => {
-        const numbers = input.replace(/\D/g, '');
-        if (numbers.length === 10) {
-          return numbers.replace(/(\d{3})(\d{3})(\d{4})/, '$1.$2.$3');
-        }
-        return input;
-      };
-
       const handleInputChange = (e) => {
         const { name, value } = e.target;
-        if (name === 'directPhone' || name === 'cellPhone') {
-          setFormData(prev => ({
-            ...prev,
-            [name]: formatPhoneNumber(value)
-          }));
-        } else {
-          setFormData(prev => ({
-            ...prev,
-            [name]: value
-          }));
-        }
+        setFormData(prev => ({ ...prev, [name]: value }));
       };
 
       const generateSignature = () => {
-        // For safety, remove HTML tags from user input:
-        const sanitizeInput = (str) => {
-          return str ? str.replace(/</g, '&lt;').replace(/>/g, '&gt;') : '';
-        };
-
-        const safeFormData = {
-          name: sanitizeInput(formData.name),
-          title: sanitizeInput(formData.title),
-          email: sanitizeInput(formData.email),
-          directPhone: sanitizeInput(formData.directPhone),
-          cellPhone: sanitizeInput(formData.cellPhone),
-          companyWebsite: sanitizeInput(formData.companyWebsite),
-          meetingLink: sanitizeInput(formData.meetingLink)
-        };
-
+        const safeFormData = { ...formData };
         return `
-          <table style="font-family: Arial, sans-serif; font-size: 12px; line-height: 1.4; background-color: transparent;">
-            <tr style="background-color: transparent;">
-              <td style="vertical-align: top; padding-right: 10px; background-color: transparent;">
-                ${
-                  formData.photoUrl
-                    ? `<img src="${formData.photoUrl}" alt="Profile Photo" style="width: 85px; height: 100px; border-radius: 4px; object-fit: cover;" />`
-                    : '<div style="width: 85px; height: 100px; background-color: #f0f0f0; border-radius: 4px;"></div>'
-                }
+          <table style="font-family: Arial, sans-serif; font-size: 12px; line-height: 1.4;">
+            <tr>
+              <td style="padding-right: 10px;">
+                ${formData.photoUrl ? `<img src="${formData.photoUrl}" style="width: 85px; height: 100px; border-radius: 4px; object-fit: cover;" />` : ''}
               </td>
-              <td style="vertical-align: top; background-color: transparent;">
-                <table style="border-collapse: collapse; background-color: transparent;">
-                  <tr style="background-color: transparent;">
-                    <td style="padding-bottom: 5px; background-color: transparent;">
-                      ${
-                        formData.companyLogoUrl
-                          ? `<div style="margin-bottom: 2px; background-color: transparent;"><img src="${formData.companyLogoUrl}" alt="Company Logo" style="height: 25px;" /></div>`
-                          : ''
-                      }
-                      <span style="color: #000000; font-weight: bold;">${safeFormData.name}</span>
-                      ${
-                        safeFormData.title
-                          ? ` | <span style="font-weight: bold;">${safeFormData.title.toUpperCase()}</span>`
-                          : ''
-                      }
-                    </td>
-                  </tr>
-                  <tr style="background-color: transparent;">
-                    <td style="color: #000000; background-color: transparent;">
-                      ${
-                        safeFormData.directPhone
-                          ? `D: ${safeFormData.directPhone}`
-                          : ''
-                      }
-                      ${
-                        safeFormData.cellPhone
-                          ? ` | C: ${safeFormData.cellPhone}`
-                          : ''
-                      }
-                    </td>
-                  </tr>
-                  <tr style="background-color: transparent;">
-                    <td style="background-color: transparent;">
-                      <a href="mailto:${safeFormData.email}" style="color: #4A90E2; text-decoration: none;">${safeFormData.email}</a>
-                      ${
-                        safeFormData.companyWebsite
-                          ? ` | <a href="https://${safeFormData.companyWebsite}" style="color: #4A90E2; text-decoration: none;">${safeFormData.companyWebsite}</a>`
-                          : ''
-                      }
-                      ${
-                        safeFormData.meetingLink
-                          ? ` | <a href="${safeFormData.meetingLink}" style="color: #4A90E2; text-decoration: none;">Schedule a meeting</a>`
-                          : ''
-                      }
-                    </td>
-                  </tr>
-                </table>
+              <td>
+                <span style="font-weight: bold;">${safeFormData.name}</span>
+                ${safeFormData.title ? ` | <span>${safeFormData.title}</span>` : ''}
+                <br/>
+                <a href="mailto:${safeFormData.email}" style="color: #4A90E2;">${safeFormData.email}</a>
               </td>
             </tr>
           </table>
         `;
-      };
-
-      const showCopyAlert = () => {
-        const alert = document.getElementById('copyAlert');
-        alert.style.display = 'block';
-        setTimeout(() => {
-          alert.style.display = 'none';
-        }, 3000);
       };
 
       const copyToClipboard = () => {
@@ -189,175 +91,23 @@
         selection.removeAllRanges();
         selection.addRange(range);
 
-        try {
-          document.execCommand('copy');
-          showCopyAlert();
-        } catch (err) {
-          alert('Failed to copy signature. Please try again.');
-        }
-
-        selection.removeAllRanges();
+        document.execCommand('copy');
         document.body.removeChild(tempDiv);
+        document.getElementById('copyAlert').style.display = 'block';
+      };
+
+      const copyHtmlToClipboard = () => {
+        const htmlSignature = generateSignature();
+        navigator.clipboard.writeText(htmlSignature).then(() => {
+          document.getElementById('copyHtmlAlert').style.display = 'block';
+        });
       };
 
       return (
-        <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-lg p-6">
-          <h1 className="text-2xl font-bold mb-6">Email Signature Generator (Using Direct Image URLs)</h1>
-          <div className="space-y-4">
-            {/* Name and Title */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">Name</label>
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  className="w-full p-2 border rounded"
-                  placeholder="Full Name"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Title</label>
-                <input
-                  type="text"
-                  name="title"
-                  value={formData.title}
-                  onChange={handleInputChange}
-                  className="w-full p-2 border rounded"
-                  placeholder="Business Development Manager"
-                />
-              </div>
-            </div>
-
-            {/* Photo URL and Logo URL */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">Profile Photo URL</label>
-                <input
-                  type="text"
-                  name="photoUrl"
-                  value={formData.photoUrl}
-                  onChange={handleInputChange}
-                  className="w-full p-2 border rounded"
-                  placeholder="https://..."
-                />
-                {formData.photoUrl && (
-                  <img
-                    src={formData.photoUrl}
-                    alt="Profile Preview"
-                    className="image-preview mt-2"
-                  />
-                )}
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Company Logo URL</label>
-                <input
-                  type="text"
-                  name="companyLogoUrl"
-                  value={formData.companyLogoUrl}
-                  onChange={handleInputChange}
-                  className="w-full p-2 border rounded"
-                  placeholder="https://..."
-                />
-                {formData.companyLogoUrl && (
-                  <img
-                    src={formData.companyLogoUrl}
-                    alt="Logo Preview"
-                    className="logo-preview mt-2"
-                  />
-                )}
-              </div>
-            </div>
-
-            {/* Phones */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">Direct Phone</label>
-                <input
-                  type="tel"
-                  name="directPhone"
-                  value={formData.directPhone}
-                  onChange={handleInputChange}
-                  className="w-full p-2 border rounded"
-                  placeholder="205.258.9589"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Cell Phone</label>
-                <input
-                  type="tel"
-                  name="cellPhone"
-                  value={formData.cellPhone}
-                  onChange={handleInputChange}
-                  className="w-full p-2 border rounded"
-                  placeholder="205.258.9589"
-                />
-              </div>
-            </div>
-
-            {/* Email, Website, Meeting Link */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">Email</label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  className="w-full p-2 border rounded"
-                  placeholder="name@company.com"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Company Website</label>
-                <input
-                  type="text"
-                  name="companyWebsite"
-                  value={formData.companyWebsite}
-                  onChange={handleInputChange}
-                  className="w-full p-2 border rounded"
-                  placeholder="company.com"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-1">Meeting Schedule Link</label>
-              <input
-                type="url"
-                name="meetingLink"
-                value={formData.meetingLink}
-                onChange={handleInputChange}
-                className="w-full p-2 border rounded"
-                placeholder="https://meetings.hubspot.com/..."
-              />
-            </div>
-
-            {/* Buttons */}
-            <div className="flex gap-4">
-              <button
-                onClick={() => setShowPreview(!showPreview)}
-                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-              >
-                {showPreview ? 'Hide Preview' : 'Show Preview'}
-              </button>
-              <button
-                onClick={copyToClipboard}
-                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-              >
-                Copy Signature
-              </button>
-            </div>
-
-            {showPreview && (
-              <div className="mt-4 border p-4 rounded">
-                <div
-                  dangerouslySetInnerHTML={{ __html: generateSignature() }}
-                />
-              </div>
-            )}
-          </div>
+        <div>
+          <button onClick={copyToClipboard}>Copy Signature</button>
+          <button onClick={copyHtmlToClipboard}>Copy HTML</button>
+          {showPreview && <div dangerouslySetInnerHTML={{ __html: generateSignature() }} />}
         </div>
       );
     };
