@@ -30,19 +30,6 @@
       from {opacity: 1;}
       to {opacity: 0;}
     }
-
-    .image-preview {
-      width: 85px;
-      height: 100px;
-      object-fit: cover;
-      border-radius: 4px;
-    }
-    .logo-preview {
-      height: 25px;
-      width: auto;
-      max-width: 200px;
-      object-fit: contain;
-    }
   </style>
 </head>
 <body class="bg-gray-100 min-h-screen p-4">
@@ -52,7 +39,6 @@
   </div>
 
   <script type="text/babel">
-
     const EmailSignatureGenerator = () => {
       const [showPreview, setShowPreview] = React.useState(false);
       const [formData, setFormData] = React.useState({
@@ -67,34 +53,13 @@
         meetingLink: ''
       });
 
-      const formatPhoneNumber = (input) => {
-        const numbers = input.replace(/\D/g, '');
-        if (numbers.length === 10) {
-          return numbers.replace(/(\d{3})(\d{3})(\d{4})/, '$1.$2.$3');
-        }
-        return input;
-      };
-
       const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({
-          ...prev,
-          [name]: name === 'directPhone' || name === 'cellPhone' ? formatPhoneNumber(value) : value
-        }));
+        setFormData(prev => ({ ...prev, [name]: value }));
       };
 
       const generateSignature = () => {
-        const sanitizeInput = (str) => str ? str.replace(/</g, '&lt;').replace(/>/g, '&gt;') : '';
-        const safeFormData = {
-          name: sanitizeInput(formData.name),
-          title: sanitizeInput(formData.title),
-          email: sanitizeInput(formData.email),
-          directPhone: sanitizeInput(formData.directPhone),
-          cellPhone: sanitizeInput(formData.cellPhone),
-          companyWebsite: sanitizeInput(formData.companyWebsite),
-          meetingLink: sanitizeInput(formData.meetingLink)
-        };
-        return `<table style="font-family: Arial, sans-serif; font-size: 12px; line-height: 1.4;"><tr><td>${safeFormData.name}</td></tr></table>`;
+        return `<p><strong>${formData.name}</strong><br>${formData.title}<br>${formData.email}</p>`;
       };
 
       const showCopyAlert = () => {
@@ -111,16 +76,22 @@
       return (
         <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-lg p-6">
           <h1 className="text-2xl font-bold mb-6">Email Signature Generator</h1>
-          <div className="flex gap-4">
-            <button onClick={() => setShowPreview(!showPreview)} className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
-              {showPreview ? 'Hide Preview' : 'Show Preview'}
-            </button>
-            <button onClick={() => copyToClipboard(false)} className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
-              Copy Signature
-            </button>
-            <button onClick={() => copyToClipboard(true)} className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">
-              Copy HTML
-            </button>
+          <div className="space-y-4">
+            <input type="text" name="name" placeholder="Full Name" className="w-full p-2 border rounded" onChange={handleInputChange} />
+            <input type="text" name="title" placeholder="Job Title" className="w-full p-2 border rounded" onChange={handleInputChange} />
+            <input type="email" name="email" placeholder="Email Address" className="w-full p-2 border rounded" onChange={handleInputChange} />
+            <div className="flex gap-4">
+              <button onClick={() => setShowPreview(!showPreview)} className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                {showPreview ? 'Hide Preview' : 'Show Preview'}
+              </button>
+              <button onClick={() => copyToClipboard(false)} className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
+                Copy Signature
+              </button>
+              <button onClick={() => copyToClipboard(true)} className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">
+                Copy HTML
+              </button>
+            </div>
+            {showPreview && <div className="mt-4 border p-4 rounded" dangerouslySetInnerHTML={{ __html: generateSignature() }} />}
           </div>
         </div>
       );
