@@ -69,11 +69,12 @@
               <td style="vertical-align: top;">
                 ${formData.companyLogoUrl ? `<div style="margin-bottom: 5px;"><img src="${formData.companyLogoUrl}" alt="Company Logo" style="height: 25px; max-width: 200px; object-fit: contain;" /></div>` : ''}
                 <span style="color: #000000; font-weight: bold;">${formData.name}</span>
-                <span style="font-weight: bold;"> | ${formData.title.toUpperCase()}</span><br>
-                D: ${formData.directPhone} | C: ${formData.cellPhone}<br>
-                <a href="mailto:${formData.email}" style="color: #4A90E2; text-decoration: none;">${formData.email}</a> |
-                <a href="https://${formData.companyWebsite}" style="color: #4A90E2; text-decoration: none;">${formData.companyWebsite}</a> |
-                <a href="${formData.meetingLink}" style="color: #4A90E2; text-decoration: none;">Schedule a meeting</a>
+                ${formData.title ? `<span style="font-weight: bold;"> | ${formData.title.toUpperCase()}</span>` : ''}<br>
+                ${formData.directPhone ? `D: ${formData.directPhone}` : ''}
+                ${formData.cellPhone ? ` | C: ${formData.cellPhone}` : ''}<br>
+                ${formData.email ? `<a href="mailto:${formData.email}" style="color: #4A90E2; text-decoration: none;">${formData.email}</a>` : ''}
+                ${formData.companyWebsite ? ` | <a href="https://${formData.companyWebsite}" style="color: #4A90E2; text-decoration: none;">${formData.companyWebsite}</a>` : ''}
+                ${formData.meetingLink ? ` | <a href="${formData.meetingLink}" style="color: #4A90E2; text-decoration: none;">Schedule a meeting</a>` : ''}
               </td>
             </tr>
           </table>
