@@ -30,6 +30,19 @@
       from {opacity: 1;}
       to {opacity: 0;}
     }
+
+    .image-preview {
+      width: 85px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 4px;
+    }
+    .logo-preview {
+      height: 25px;
+      width: auto;
+      max-width: 200px;
+      object-fit: contain;
+    }
   </style>
 </head>
 <body class="bg-gray-100 min-h-screen p-4">
@@ -37,11 +50,9 @@
   <div id="copyAlert" class="copy-alert">
     Signature copied! Paste in Gmail using Ctrl+V (or Cmd+V on Mac)
   </div>
-  <div id="copyHtmlAlert" class="copy-alert" style="background-color: #2196F3;">
-    HTML copied! Paste into any HTML editor.
-  </div>
 
   <script type="text/babel">
+
     const EmailSignatureGenerator = () => {
       const [showPreview, setShowPreview] = React.useState(false);
       const [formData, setFormData] = React.useState({
@@ -56,58 +67,61 @@
         meetingLink: ''
       });
 
+      const formatPhoneNumber = (input) => {
+        const numbers = input.replace(/\D/g, '');
+        if (numbers.length === 10) {
+          return numbers.replace(/(\d{3})(\d{3})(\d{4})/, '$1.$2.$3');
+        }
+        return input;
+      };
+
       const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+        setFormData(prev => ({
+          ...prev,
+          [name]: name === 'directPhone' || name === 'cellPhone' ? formatPhoneNumber(value) : value
+        }));
       };
 
       const generateSignature = () => {
-        const safeFormData = { ...formData };
-        return `
-          <table style="font-family: Arial, sans-serif; font-size: 12px; line-height: 1.4;">
-            <tr>
-              <td style="padding-right: 10px;">
-                ${formData.photoUrl ? `<img src="${formData.photoUrl}" style="width: 85px; height: 100px; border-radius: 4px; object-fit: cover;" />` : ''}
-              </td>
-              <td>
-                <span style="font-weight: bold;">${safeFormData.name}</span>
-                ${safeFormData.title ? ` | <span>${safeFormData.title}</span>` : ''}
-                <br/>
-                <a href="mailto:${safeFormData.email}" style="color: #4A90E2;">${safeFormData.email}</a>
-              </td>
-            </tr>
-          </table>
-        `;
+        const sanitizeInput = (str) => str ? str.replace(/</g, '&lt;').replace(/>/g, '&gt;') : '';
+        const safeFormData = {
+          name: sanitizeInput(formData.name),
+          title: sanitizeInput(formData.title),
+          email: sanitizeInput(formData.email),
+          directPhone: sanitizeInput(formData.directPhone),
+          cellPhone: sanitizeInput(formData.cellPhone),
+          companyWebsite: sanitizeInput(formData.companyWebsite),
+          meetingLink: sanitizeInput(formData.meetingLink)
+        };
+        return `<table style="font-family: Arial, sans-serif; font-size: 12px; line-height: 1.4;"><tr><td>${safeFormData.name}</td></tr></table>`;
       };
 
-      const copyToClipboard = () => {
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = generateSignature();
-        document.body.appendChild(tempDiv);
-
-        const range = document.createRange();
-        range.selectNodeContents(tempDiv);
-        const selection = window.getSelection();
-        selection.removeAllRanges();
-        selection.addRange(range);
-
-        document.execCommand('copy');
-        document.body.removeChild(tempDiv);
-        document.getElementById('copyAlert').style.display = 'block';
+      const showCopyAlert = () => {
+        const alert = document.getElementById('copyAlert');
+        alert.style.display = 'block';
+        setTimeout(() => alert.style.display = 'none', 3000);
       };
 
-      const copyHtmlToClipboard = () => {
-        const htmlSignature = generateSignature();
-        navigator.clipboard.writeText(htmlSignature).then(() => {
-          document.getElementById('copyHtmlAlert').style.display = 'block';
-        });
+      const copyToClipboard = (html = false) => {
+        const content = html ? generateSignature() : document.getElementById('root').innerHTML;
+        navigator.clipboard.writeText(content).then(showCopyAlert);
       };
 
       return (
-        <div>
-          <button onClick={copyToClipboard}>Copy Signature</button>
-          <button onClick={copyHtmlToClipboard}>Copy HTML</button>
-          {showPreview && <div dangerouslySetInnerHTML={{ __html: generateSignature() }} />}
+        <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-lg p-6">
+          <h1 className="text-2xl font-bold mb-6">Email Signature Generator</h1>
+          <div className="flex gap-4">
+            <button onClick={() => setShowPreview(!showPreview)} className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+              {showPreview ? 'Hide Preview' : 'Show Preview'}
+            </button>
+            <button onClick={() => copyToClipboard(false)} className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
+              Copy Signature
+            </button>
+            <button onClick={() => copyToClipboard(true)} className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">
+              Copy HTML
+            </button>
+          </div>
         </div>
       );
     };
