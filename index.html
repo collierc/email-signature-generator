@@ -30,6 +30,19 @@
       from {opacity: 1;}
       to {opacity: 0;}
     }
+
+    .image-preview {
+      width: 85px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 4px;
+    }
+    .logo-preview {
+      height: 25px;
+      width: auto;
+      max-width: 200px;
+      object-fit: contain;
+    }
   </style>
 </head>
 <body class="bg-gray-100 min-h-screen p-4">
@@ -39,6 +52,7 @@
   </div>
 
   <script type="text/babel">
+
     const EmailSignatureGenerator = () => {
       const [showPreview, setShowPreview] = React.useState(false);
       const [formData, setFormData] = React.useState({
@@ -59,7 +73,26 @@
       };
 
       const generateSignature = () => {
-        return `<p><strong>${formData.name}</strong><br>${formData.title}<br>${formData.email}</p>`;
+        return `
+          <table style="font-family: Arial, sans-serif; font-size: 12px; line-height: 1.4; background-color: transparent;">
+            <tr>
+              <td style="vertical-align: top; padding-right: 10px;">
+                <img src="${formData.photoUrl}" alt="Profile Photo" style="width: 85px; height: 100px; border-radius: 4px; object-fit: cover;" />
+              </td>
+              <td style="vertical-align: top;">
+                <div style="margin-bottom: 5px;">
+                  <img src="${formData.companyLogoUrl}" alt="Company Logo" style="height: 25px; max-width: 200px; object-fit: contain;" />
+                </div>
+                <span style="color: #000000; font-weight: bold;">${formData.name}</span>
+                <span style="font-weight: bold;"> | ${formData.title.toUpperCase()}</span><br>
+                D: ${formData.directPhone} | C: ${formData.cellPhone}<br>
+                <a href="mailto:${formData.email}" style="color: #4A90E2; text-decoration: none;">${formData.email}</a> |
+                <a href="https://${formData.companyWebsite}" style="color: #4A90E2; text-decoration: none;">${formData.companyWebsite}</a> |
+                <a href="${formData.meetingLink}" style="color: #4A90E2; text-decoration: none;">Schedule a meeting</a>
+              </td>
+            </tr>
+          </table>
+        `;
       };
 
       const showCopyAlert = () => {
@@ -93,7 +126,7 @@
 
       return (
         <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-lg p-6">
-          <h1 className="text-2xl font-bold mb-6">Email Signature Generator</h1>
+          <h1 className="text-2xl font-bold mb-6">Email Signature Generator (Using Direct Image URLs)</h1>
           <div className="space-y-4">
             <input type="text" name="name" placeholder="Full Name" className="w-full p-2 border rounded" onChange={handleInputChange} />
             <input type="text" name="title" placeholder="Job Title" className="w-full p-2 border rounded" onChange={handleInputChange} />
