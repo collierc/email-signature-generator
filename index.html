@@ -98,6 +98,12 @@
             <input type="text" name="name" placeholder="Full Name" className="w-full p-2 border rounded" onChange={handleInputChange} />
             <input type="text" name="title" placeholder="Job Title" className="w-full p-2 border rounded" onChange={handleInputChange} />
             <input type="email" name="email" placeholder="Email Address" className="w-full p-2 border rounded" onChange={handleInputChange} />
+            <input type="text" name="photoUrl" placeholder="Profile Photo URL" className="w-full p-2 border rounded" onChange={handleInputChange} />
+            <input type="text" name="companyLogoUrl" placeholder="Company Logo URL" className="w-full p-2 border rounded" onChange={handleInputChange} />
+            <input type="tel" name="directPhone" placeholder="Direct Phone" className="w-full p-2 border rounded" onChange={handleInputChange} />
+            <input type="tel" name="cellPhone" placeholder="Cell Phone" className="w-full p-2 border rounded" onChange={handleInputChange} />
+            <input type="text" name="companyWebsite" placeholder="Company Website" className="w-full p-2 border rounded" onChange={handleInputChange} />
+            <input type="url" name="meetingLink" placeholder="Meeting Schedule Link" className="w-full p-2 border rounded" onChange={handleInputChange} />
             <div className="flex gap-4">
               <button onClick={() => setShowPreview(!showPreview)} className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
                 {showPreview ? 'Hide Preview' : 'Show Preview'}
