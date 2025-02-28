@@ -30,19 +30,6 @@
       from {opacity: 1;}
       to {opacity: 0;}
     }
-
-    .image-preview {
-      width: 85px;
-      height: 100px;
-      object-fit: cover;
-      border-radius: 4px;
-    }
-    .logo-preview {
-      height: 25px;
-      width: auto;
-      max-width: 200px;
-      object-fit: contain;
-    }
   </style>
 </head>
 <body class="bg-gray-100 min-h-screen p-4">
@@ -77,12 +64,10 @@
           <table style="font-family: Arial, sans-serif; font-size: 12px; line-height: 1.4; background-color: transparent;">
             <tr>
               <td style="vertical-align: top; padding-right: 10px;">
-                <img src="${formData.photoUrl}" alt="Profile Photo" style="width: 85px; height: 100px; border-radius: 4px; object-fit: cover;" />
+                ${formData.photoUrl ? `<img src="${formData.photoUrl}" alt="Profile Photo" style="width: 85px; height: 100px; border-radius: 4px; object-fit: cover;" />` : ''}
               </td>
               <td style="vertical-align: top;">
-                <div style="margin-bottom: 5px;">
-                  <img src="${formData.companyLogoUrl}" alt="Company Logo" style="height: 25px; max-width: 200px; object-fit: contain;" />
-                </div>
+                ${formData.companyLogoUrl ? `<div style="margin-bottom: 5px;"><img src="${formData.companyLogoUrl}" alt="Company Logo" style="height: 25px; max-width: 200px; object-fit: contain;" /></div>` : ''}
                 <span style="color: #000000; font-weight: bold;">${formData.name}</span>
                 <span style="font-weight: bold;"> | ${formData.title.toUpperCase()}</span><br>
                 D: ${formData.directPhone} | C: ${formData.cellPhone}<br>
